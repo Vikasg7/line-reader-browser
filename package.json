@@ -1,0 +1,29 @@
+{
+  "name": "line-reader-browser",
+  "version": "0.0.1",
+  "description": "reading a file line by line in browser",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "tsc:w": "node_modules/.bin/tsc -w",
+    "watchify": "watchify dist/tests/test.js -o dist/tests/bundle.js",
+    "watch": "start /B \"\" npm run tsc:w && start /B \"\" npm run watchify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "pending"
+  },
+  "keywords": [
+    "pending"
+  ],
+  "author": "Vikas Gautam <v33vikasgautam@gmail.com> (http://mytrikks.blogspot.com)",
+  "license": "MIT",
+  "dependencies": {
+    "thenForEach": "git+https://github.com/Vikasg7/thenForEach.git",
+    "typescript": "^2.4.2"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "watchify": "^3.9.0"
+  }
+}

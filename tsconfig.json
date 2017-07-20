@@ -1,0 +1,18 @@
+{
+    "include": [
+        "src/*.ts",
+        "src/**/*.ts"
+    ],
+    "compilerOptions": {
+        "target": "es6",
+        "declaration": true,
+        "module": "commonjs",
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": false,
+        "experimentalDecorators": false,
+        "noImplicitAny": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "./dist/"
+    }
+}
