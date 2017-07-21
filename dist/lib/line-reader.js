@@ -27,6 +27,8 @@ class LineReader {
         return lines;
     }
     _cleanUp() {
+        this._file = null;
+        this._chunkSize = null;
         this._lastLine = null;
         this._bytesRead = null;
         this._lineNum = null;
