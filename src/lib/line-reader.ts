@@ -39,6 +39,7 @@ export class LineReader {
 
    public forEachLine(fn: (line?: string, index?: number, context?: any) => void, context?: any): Promise<any> {
       if (this._bytesRead >= this._file.size) { // No more content in the file
+         if (!this._lastLine) return Promise.resolve(context)
          return Promise.resolve(this._lastLine)
             .then((line) => fn(line, this._lineNum += 1, context))
             .then(() => this._cleanUp())

@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "install": "tsc && browserify dist/tests/test.js -o dist/tests/bundle.js",
     "tsc:w": "node_modules/.bin/tsc -w",
     "watchify": "watchify dist/tests/test.js -o dist/tests/bundle.js",
     "watch": "start /B \"\" npm run tsc:w && start /B \"\" npm run watchify"
