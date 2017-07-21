@@ -11,13 +11,17 @@
    import { LineReader } from "line-reader-browser"
    
    // file is javascript File Object returned from input element
-   // context is optional. It can be used to inside processLineFn 
-   const lr = new LineReader(file: File, context = {})
-   
-   lr.forEachLine(processLineFn)
+   // chunkSize(optional) is number of bytes to be read at one time from file. defaults to 8 * 1024
+   const file: File
+   const chunSize: number
+   const lr = new LineReader(file, chunkSize)
+
+   // context is optional. It can be used to inside processLineFn   
+   const context = {}
+   lr.forEachLine(processLineFn, context)
      .then((context) => console.log("Done!", context))
 
-   // context is same as passed while calling LineReader
+   // context is same Object as passed while calling forEachLine
    function processLineFn(line: string, index: number, context: any) {
       console.log(index, line)
    }
