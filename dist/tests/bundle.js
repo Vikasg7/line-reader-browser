@@ -39,6 +39,8 @@ class LineReader {
         this._lastLine = null;
         this._bytesRead = null;
         this._lineNum = null;
+        this._continue = null;
+        return Promise.resolve(); // this will help in chaining promises
     }
     forEachLine(fn, context) {
         if (this._bytesRead >= this._file.size) {
@@ -53,8 +55,8 @@ class LineReader {
             const b = this._file.slice(this._bytesRead, this._bytesRead + this._chunkSize);
             return this._readFile(b)
                 .then((buf) => this._buf2Lines(buf))
-                .thenForEach((line) => fn(line, this._lineNum += 1, context))
-                .then(() => this.forEachLine(fn, context));
+                .thenForEach((line) => this._continue = fn(line, this._lineNum += 1, context))
+                .then(() => this._continue === false ? this._cleanUp().then(() => context) : this.forEachLine(fn, context));
         }
     }
 }
@@ -64,12 +66,21 @@ exports.LineReader = LineReader;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("../index");
-document.querySelector("input").onchange = () => {
-    const input = document.querySelector("input");
+document.querySelector("input.fullFile").onchange = () => {
+    console.log("fullFile");
+    const input = document.querySelector("input.fullFile");
     if (!input.files.length)
         return;
     const lr = new index_1.LineReader(input.files[0], 4 * 1024);
     lr.forEachLine((line, i) => console.log(i, line)).then(() => console.log("Done!"));
+};
+document.querySelector("input.someLines").onchange = () => {
+    console.log("someLines");
+    const input = document.querySelector("input.someLines");
+    if (!input.files.length)
+        return;
+    const lr = new index_1.LineReader(input.files[0], 4 * 1024);
+    lr.forEachLine((line, i) => (i === 10 ? false : console.log(i, line))).then(() => console.log("Done!"));
 };
 
 },{"../index":1}],4:[function(require,module,exports){
@@ -98,7 +109,7 @@ function iterateArr(arr, i, context, doFn) {
     const item = arr.shift();
     return Promise.resolve(item)
         .then((item) => doFn(item, i += 1, context))
-        .then(() => arguments.callee(arr, i, context, doFn));
+        .then((_continue) => _continue !== false && iterateArr(arr, i, context, doFn));
 }
 function iterateIterable(iterable, i, context, doFn) {
     const item = iterable.next();
@@ -106,7 +117,7 @@ function iterateIterable(iterable, i, context, doFn) {
         return;
     return Promise.resolve(item.value)
         .then((item) => doFn(item, i += 1, context))
-        .then(() => arguments.callee(iterable, i, context, doFn));
+        .then((_continue) => _continue !== false && iterateIterable(iterable, i, context, doFn));
 }
 // The pattern of extending global or third party class has been copied from rxjs/add/operator in angular2
 Promise.prototype.thenForEach = thenForEach;

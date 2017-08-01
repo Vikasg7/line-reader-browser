@@ -4,6 +4,7 @@ export class LineReader {
    private _lastLine: string
    private _bytesRead: number
    private _lineNum: number
+   private _continue: any
 
    constructor(private _file: File, private _chunkSize = 8 * 1024) {
       this._lastLine = ''
@@ -37,6 +38,8 @@ export class LineReader {
       this._lastLine = null
       this._bytesRead = null
       this._lineNum = null
+      this._continue = null
+      return Promise.resolve() // this will help in chaining promises
    }
 
    public forEachLine(fn: (line?: string, index?: number, context?: any) => void, context?: any): Promise<any> {
@@ -45,13 +48,13 @@ export class LineReader {
          return Promise.resolve(this._lastLine)
             .then((line) => fn(line, this._lineNum += 1, context))
             .then(() => this._cleanUp())
-            .then(() => context) 
+            .then(() => context)
       } else { // File still have some content to read
          const b = this._file.slice(this._bytesRead, this._bytesRead + this._chunkSize)
          return this._readFile(b)
             .then((buf: ArrayBuffer) => this._buf2Lines(buf))
-            .thenForEach<string>((line) => fn(line, this._lineNum += 1, context))
-            .then(() => this.forEachLine(fn, context))
+            .thenForEach<string>((line) => this._continue = fn(line, this._lineNum += 1, context))
+            .then(() => this._continue === false ? this._cleanUp().then(() => context) : this.forEachLine(fn, context))
       }
    }
 }

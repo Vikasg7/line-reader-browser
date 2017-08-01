@@ -32,6 +32,8 @@ class LineReader {
         this._lastLine = null;
         this._bytesRead = null;
         this._lineNum = null;
+        this._continue = null;
+        return Promise.resolve(); // this will help in chaining promises
     }
     forEachLine(fn, context) {
         if (this._bytesRead >= this._file.size) {
@@ -46,8 +48,8 @@ class LineReader {
             const b = this._file.slice(this._bytesRead, this._bytesRead + this._chunkSize);
             return this._readFile(b)
                 .then((buf) => this._buf2Lines(buf))
-                .thenForEach((line) => fn(line, this._lineNum += 1, context))
-                .then(() => this.forEachLine(fn, context));
+                .thenForEach((line) => this._continue = fn(line, this._lineNum += 1, context))
+                .then(() => this._continue === false ? this._cleanUp().then(() => context) : this.forEachLine(fn, context));
         }
     }
 }

@@ -5,6 +5,7 @@ export declare class LineReader {
     private _lastLine;
     private _bytesRead;
     private _lineNum;
+    private _continue;
     constructor(_file: File, _chunkSize?: number);
     private _readFile(file);
     private _arrBuf2String(buf);
